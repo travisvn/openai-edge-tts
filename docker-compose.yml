@@ -1,0 +1,17 @@
+version: '3.8'
+services:
+  app:
+    build: .
+    ports:
+      - '${PORT:-5050}:5050'
+    env_file:
+      - .env
+    environment: # optionally define in -e argument when running docker command
+      - API_KEY=${API_KEY}
+      - PORT=${PORT}
+      - DEFAULT_VOICE=${DEFAULT_VOICE}
+      - DEFAULT_RESPONSE_FORMAT=${DEFAULT_RESPONSE}
+      - DEFAULT_SPEED=${DEFAULT_SPEED}
+      - DEFAULT_LANGUAGE=${DEFAULT_LANGUAGE}
+    volumes:
+      - .:/app
