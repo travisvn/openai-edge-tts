@@ -52,6 +52,12 @@ docker build -t openai-edge-tts .
 docker run -p 5050:5050 --env-file .env openai-edge-tts
 ```
 
+To run the container in the background, add `-d` after the `docker run` command:
+
+```bash
+docker run -d -p 5050:5050 --env-file .env openai-edge-tts
+```
+
 4. **Access the API**: Your server will be accessible at `http://localhost:5050`.
 
 ## Running with Python
