@@ -42,7 +42,7 @@ DEFAULT_LANGUAGE=en-US
 
 3. **Run with Docker Compose** (recommended):
 ```bash
-docker-compose up --build
+docker compose up --build
 ```
 
 Alternatively, **run directly with Docker**:
