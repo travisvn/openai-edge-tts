@@ -4,6 +4,8 @@ This project provides a local, OpenAI-compatible text-to-speech (TTS) API using 
 
 `edge-tts` uses Microsoft Edge's online text-to-speech service, so it is completely free.
 
+[View this project on Docker Hub](https://hub.docker.com/r/travisvn/openai-edge-tts)
+
 ## Features
 
 - **OpenAI-Compatible Endpoint**: `/v1/audio/speech` with similar request structure and behavior.
