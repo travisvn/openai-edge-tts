@@ -42,8 +42,9 @@ DEFAULT_LANGUAGE=en-US
 
 3. **Run with Docker Compose** (recommended):
 ```bash
-docker compose up --build
+docker-compose up --build
 ```
+_(Note: docker-compose is not the same as docker compose — we're working on Docker Compose V2 to accommodate both. In the interim, use the commands below if you have issues with docker compose.)_
 
 Alternatively, **run directly with Docker**:
 ```bash
