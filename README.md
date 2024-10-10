@@ -1,5 +1,6 @@
 # OpenAI-Compatible Edge-TTS API 🗣️
 
+![GitHub stars](https://img.shields.io/github/stars/travisvn/openai-edge-tts?style=social)
 ![GitHub forks](https://img.shields.io/github/forks/travisvn/openai-edge-tts?style=social)
 ![GitHub watchers](https://img.shields.io/github/watchers/travisvn/openai-edge-tts?style=social)
 ![GitHub repo size](https://img.shields.io/github/repo-size/travisvn/openai-edge-tts)
