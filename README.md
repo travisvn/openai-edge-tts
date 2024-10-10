@@ -183,3 +183,26 @@ Contributions are welcome! Please fork the repository and create a pull request 
 ### License
 
 This project is licensed under GNU General Public License v3.0 (GPL-3.0)
+
+___
+
+## Example Use Case 
+
+# Open WebUI
+
+Open up the Admin Panel and go to Settings -> Audio
+
+Below, you can see a screenshot of the correct configuration for using this project to substitute the OpenAI endpoint
+
+![Screenshot of Open WebUI Admin Settings for Audio adding the correct endpoints for this project](https://utfs.io/f/MMMHiQ1TQaBoQ2AnPhUlTDGtR4B2v7E9JZN1PU5nAseoaXIc)
+
+___
+
+
+## Quick Info
+
+- `your_api_key_here` never needs to be replaced — No "real" API key is required. Use whichever string you'd like.
+- The quickest way to get this up and running is to install docker and run the command below:
+```bash
+docker run -d -p 5050:5050 -e API_KEY=your_api_key_here -e PORT=5050 travisvn/openai-edge-tts:latest
+```
