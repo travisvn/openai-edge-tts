@@ -2,7 +2,6 @@
 
 ![GitHub stars](https://img.shields.io/github/stars/travisvn/openai-edge-tts?style=social)
 ![GitHub forks](https://img.shields.io/github/forks/travisvn/openai-edge-tts?style=social)
-![GitHub watchers](https://img.shields.io/github/watchers/travisvn/openai-edge-tts?style=social)
 ![GitHub repo size](https://img.shields.io/github/repo-size/travisvn/openai-edge-tts)
 ![GitHub language count](https://img.shields.io/github/languages/count/travisvn/openai-edge-tts)
 ![GitHub top language](https://img.shields.io/github/languages/top/travisvn/openai-edge-tts)
