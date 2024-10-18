@@ -49,6 +49,8 @@ DEFAULT_RESPONSE_FORMAT=mp3
 DEFAULT_SPEED=1.0
 
 DEFAULT_LANGUAGE=en-US
+
+REQUIRE_API_KEY=True
 ```
 
 3. **Run with Docker Compose** (recommended):
@@ -117,6 +119,8 @@ DEFAULT_RESPONSE_FORMAT=mp3
 DEFAULT_SPEED=1.0
 
 DEFAULT_LANGUAGE=en-US
+
+REQUIRE_API_KEY=True
 ```
 
 ### 5. Run the Server
@@ -180,10 +184,25 @@ curl -X POST http://localhost:5050/v1/audio/speech \
   --output speech.mp3
 ```
 
+And an example of a language other than English:
+
+```bash
+curl -X POST http://localhost:5050/v1/audio/speech \
+  -H "Content-Type: application/json" \
+  -H "Authorization: Bearer your_api_key_here" \
+  -d '{
+    "model": "tts-1",
+    "input": "じゃあ、行く。電車の時間、調べておくよ。",
+    "voice": "ja-JP-KeitaNeural"
+  }' \
+  --output speech.mp3
+```
+
 ### Additional Endpoints
 
 - **GET /v1/models**: Lists available TTS models.
-- **GET /v1/voices**: Lists all `edge-tts` voices, with language support information.
+- **GET /v1/voices**: Lists `edge-tts` voices for a given language / locale.
+- **GET /v1/voices/all**: Lists all `edge-tts` voices, with language support information.
 
 ### Contributing
 
