@@ -66,7 +66,7 @@ async def _get_voices(language=None):
     language = language or DEFAULT_LANGUAGE  # Use default if no language specified
     filtered_voices = [
         {"name": v['ShortName'], "gender": v['Gender'], "language": v['Locale']}
-        for v in all_voices if language is 'all' or language is None or v['Locale'] == language
+        for v in all_voices if language == 'all' or language is None or v['Locale'] == language
     ]
     return filtered_voices
 
