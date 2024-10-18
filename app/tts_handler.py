@@ -60,12 +60,15 @@ def get_models():
         {"id": "tts-1-hd", "name": "Text-to-speech v1 HD"}
     ]
 
-def get_voices(language=None):
+async def _get_voices(language=None):
     # List all voices, filter by language if specified
-    all_voices = edge_tts.list_voices()
+    all_voices = await edge_tts.list_voices()
     language = language or DEFAULT_LANGUAGE  # Use default if no language specified
     filtered_voices = [
         {"name": v['ShortName'], "gender": v['Gender'], "language": v['Locale']}
-        for v in all_voices if language is None or v['Locale'] == language
+        for v in all_voices if language is 'all' or language is None or v['Locale'] == language
     ]
     return filtered_voices
+
+def get_voices(language=None):
+    return asyncio.run(_get_voices(language))

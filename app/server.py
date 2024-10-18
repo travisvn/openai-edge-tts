@@ -42,15 +42,26 @@ def text_to_speech():
     # Return the file with the correct MIME type
     return send_file(output_file_path, mimetype=mime_type, as_attachment=True, download_name=f"speech.{response_format}")
 
-@app.route('/v1/models', methods=['GET'])
+@app.route('/v1/models', methods=['GET', 'POST'])
 @require_api_key
 def list_models():
     return jsonify({"data": get_models()})
 
-@app.route('/v1/voices', methods=['GET'])
+@app.route('/v1/voices', methods=['GET', 'POST'])
 @require_api_key
 def list_voices():
-    return jsonify({"voices": get_voices()})
+    specific_language = None
+
+    data = request.args if request.method == 'GET' else request.json
+    if data and ('language' in data or 'locale' in data):
+        specific_language = data.get('language') if 'language' in data else data.get('locale')
+
+    return jsonify({"voices": get_voices(specific_language)})
+
+@app.route('/v1/voices/all', methods=['GET', 'POST'])
+@require_api_key
+def list_all_voices():
+    return jsonify({"voices": get_voices('all')})
 
 print(f" Edge TTS (Free Azure TTS) Replacement for OpenAI's TTS API")
 print(f" ")
