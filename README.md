@@ -15,6 +15,8 @@ This project provides a local, OpenAI-compatible text-to-speech (TTS) API using 
 
 [View this project on Docker Hub](https://hub.docker.com/r/travisvn/openai-edge-tts)
 
+# Please ⭐️ star this repo if you find it helpful
+
 ## Features
 
 - **OpenAI-Compatible Endpoint**: `/v1/audio/speech` with similar request structure and behavior.
