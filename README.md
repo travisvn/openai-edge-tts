@@ -37,7 +37,7 @@ This project provides a local, OpenAI-compatible text-to-speech (TTS) API using 
 
 1. **Clone the Repository**:
 ```bash
-git clone https://github.com/your-username/openai-edge-tts.git
+git clone https://github.com/travisvn/openai-edge-tts.git
 cd openai-edge-tts
 ```
 
@@ -55,11 +55,23 @@ DEFAULT_LANGUAGE=en-US
 REQUIRE_API_KEY=True
 ```
 
-3. **Run with Docker Compose** (recommended):
+Or, copy the default `.env.example` with the following:
 ```bash
-docker-compose up --build
+cp .env.example .env
 ```
-_(Note: docker-compose is not the same as docker compose — we're working on Docker Compose V2 to accommodate both. In the interim, use the commands below if you have issues with docker compose.)_
+
+3. **Run with Docker Compose** (recommended):
+
+```bash
+docker compose up --build
+```
+_(Note: docker-compose is not the same as docker compose)_
+
+Run with `-d` to run docker compose in "detached mode", meaning it will run in the background and free up your terminal.
+
+```bash
+docker compose up -d
+```
 
 Alternatively, **run directly with Docker**:
 ```bash
@@ -82,7 +94,7 @@ If you prefer to run this project directly with Python, follow these steps to se
 ### 1. Clone the Repository
 
 ```bash
-git clone https://github.com/your-username/openai-edge-tts.git
+git clone https://github.com/travisvn/openai-edge-tts.git
 cd openai-edge-tts
 ```
 
@@ -202,9 +214,9 @@ curl -X POST http://localhost:5050/v1/audio/speech \
 
 ### Additional Endpoints
 
-- **GET /v1/models**: Lists available TTS models.
-- **GET /v1/voices**: Lists `edge-tts` voices for a given language / locale.
-- **GET /v1/voices/all**: Lists all `edge-tts` voices, with language support information.
+- **POST/GET /v1/models**: Lists available TTS models.
+- **POST/ET /v1/voices**: Lists `edge-tts` voices for a given language / locale.
+- **POST/GET /v1/voices/all**: Lists all `edge-tts` voices, with language support information.
 
 ### Contributing
 
