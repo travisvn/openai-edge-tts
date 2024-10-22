@@ -1,5 +1,3 @@
-# tts_handler.py
-
 import edge_tts
 import asyncio
 import tempfile
@@ -19,6 +17,14 @@ voice_mapping = {
     'shimmer': 'en-US-EmmaNeural'
 }
 
+def is_ffmpeg_installed():
+    """Check if FFmpeg is installed and accessible."""
+    try:
+        subprocess.run(['ffmpeg', '-version'], check=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+        return True
+    except (subprocess.CalledProcessError, FileNotFoundError):
+        return False
+
 async def _generate_audio(text, voice, response_format, speed):
     # Determine if the voice is an OpenAI-compatible voice or a direct edge-tts voice
     edge_tts_voice = voice_mapping.get(voice, voice)  # Use mapping if in OpenAI names, otherwise use as-is
@@ -32,13 +38,21 @@ async def _generate_audio(text, voice, response_format, speed):
     if response_format == "mp3" and speed == 1.0:
         return temp_output_file.name
 
-    # Convert to the requested format if not mp3 or if speed adjustment is needed
+    # Check if FFmpeg is installed
+    ffmpeg_available = is_ffmpeg_installed()
+
+    # If FFmpeg is not available, return the generated mp3 file without conversion
+    if not ffmpeg_available:
+        print("FFmpeg not available. Returning unmodified mp3 file.")
+        return temp_output_file.name
+
+    # Convert to the requested format if FFmpeg is available
     converted_output_file = tempfile.NamedTemporaryFile(delete=False, suffix=f".{response_format}")
-    
+
     # ffmpeg playback speed adjustment
     speed_filter = f"atempo={speed}" if response_format != "pcm" else f"asetrate=44100*{speed},aresample=44100"
     ffmpeg_command = [
-        "ffmpeg", "-i", temp_output_file.name, 
+        "ffmpeg", "-i", temp_output_file.name,
         "-filter:a", speed_filter,  # Apply speed adjustment
         "-f", response_format, "-y",
         converted_output_file.name

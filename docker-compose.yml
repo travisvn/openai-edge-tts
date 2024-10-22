@@ -1,4 +1,3 @@
-version: '3.8'
 services:
   app:
     build: .
@@ -7,12 +6,10 @@ services:
     env_file:
       - .env
     environment: # optionally define in -e argument when running docker command
-      - API_KEY=${API_KEY}
-      - PORT=${PORT}
-      - DEFAULT_VOICE=${DEFAULT_VOICE}
-      - DEFAULT_RESPONSE_FORMAT=${DEFAULT_RESPONSE}
-      - DEFAULT_SPEED=${DEFAULT_SPEED}
-      - DEFAULT_LANGUAGE=${DEFAULT_LANGUAGE}
-      - REQUIRE_API_KEY=${REQUIRE_API_KEY}
-    volumes:
-      - .:/app
+      API_KEY: ${API_KEY:-your_api_key_here}
+      PORT: ${PORT:-5050}
+      DEFAULT_VOICE: ${DEFAULT_VOICE:-en-US-AndrewNeural}
+      DEFAULT_RESPONSE_FORMAT: ${DEFAULT_RESPONSE_FORMAT:-mp3}
+      DEFAULT_SPEED: ${DEFAULT_SPEED:-1.0}
+      DEFAULT_LANGUAGE: ${DEFAULT_LANGUAGE:-en-US}
+      REQUIRE_API_KEY: ${REQUIRE_API_KEY:-True}
