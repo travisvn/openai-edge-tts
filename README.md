@@ -215,7 +215,7 @@ curl -X POST http://localhost:5050/v1/audio/speech \
 ### Additional Endpoints
 
 - **POST/GET /v1/models**: Lists available TTS models.
-- **POST/ET /v1/voices**: Lists `edge-tts` voices for a given language / locale.
+- **POST/GET /v1/voices**: Lists `edge-tts` voices for a given language / locale.
 - **POST/GET /v1/voices/all**: Lists all `edge-tts` voices, with language support information.
 
 ### Contributing
