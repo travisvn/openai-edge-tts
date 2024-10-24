@@ -246,7 +246,7 @@ Open up settings and go to Voice & Speech (Under AI Providers)
 
 Below, you can see a screenshot of the correct configuration for using this project to substitute the OpenAI endpoint
 
-![Screenshot of AnythingLLM settings for Voice adding the correct endpoints for this project](https://utfs.io/f/MMMHiQ1TQaBoSlrlxkDxz6pI1fUg8jNuODH2ab5VKdc7LoeF)
+![Screenshot of AnythingLLM settings for Voice adding the correct endpoints for this project](https://utfs.io/f/MMMHiQ1TQaBoGx6WUTRDJUWPLqoMsXiNkajAdVOwgcxH6uv7)
 
 ___
 
