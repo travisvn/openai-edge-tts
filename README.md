@@ -238,6 +238,16 @@ Below, you can see a screenshot of the correct configuration for using this proj
 
 ![Screenshot of Open WebUI Admin Settings for Audio adding the correct endpoints for this project](https://utfs.io/f/MMMHiQ1TQaBoQ2AnPhUlTDGtR4B2v7E9JZN1PU5nAseoaXIc)
 
+# AnythingLLM
+
+In version 1.6.8, AnythingLLM added support for "generic OpenAI TTS providers" — meaning we can use this project as the TTS provider in AnythingLLM
+
+Open up settings and go to Voice & Speech (Under AI Providers)
+
+Below, you can see a screenshot of the correct configuration for using this project to substitute the OpenAI endpoint
+
+![Screenshot of AnythingLLM settings for Voice adding the correct endpoints for this project](https://utfs.io/f/MMMHiQ1TQaBoSlrlxkDxz6pI1fUg8jNuODH2ab5VKdc7LoeF)
+
 ___
 
 
