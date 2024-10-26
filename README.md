@@ -258,3 +258,8 @@ ___
 ```bash
 docker run -d -p 5050:5050 -e API_KEY=your_api_key_here -e PORT=5050 travisvn/openai-edge-tts:latest
 ```
+
+___
+
+# Voice Samples 🎙️
+[Play voice samples and see all available Edge TTS voices](https://tts.travisvn.com/)
