@@ -224,7 +224,7 @@ Contributions are welcome! Please fork the repository and create a pull request 
 
 ### License
 
-This project is licensed under GNU General Public License v3.0 (GPL-3.0)
+This project is licensed under GNU General Public License v3.0 (GPL-3.0), and the acceptable use-case is intended to be personal use. For enterprise or non-personal use of `openai-edge-tts`, contact me at tts@travisvn.com
 
 ___
 
