@@ -238,6 +238,9 @@ Below, you can see a screenshot of the correct configuration for using this proj
 
 ![Screenshot of Open WebUI Admin Settings for Audio adding the correct endpoints for this project](https://utfs.io/f/MMMHiQ1TQaBoQ2AnPhUlTDGtR4B2v7E9JZN1PU5nAseoaXIc)
 
+> [!NOTE]
+> View the official docs for [Open WebUI integration with OpenAI Edge TTS](https://docs.openwebui.com/tutorials/integrations/openai-edge-tts-integration)
+
 # AnythingLLM
 
 In version 1.6.8, AnythingLLM added support for "generic OpenAI TTS providers" — meaning we can use this project as the TTS provider in AnythingLLM
