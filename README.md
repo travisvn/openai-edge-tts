@@ -31,7 +31,7 @@ This project provides a local, OpenAI-compatible text-to-speech (TTS) API using 
 
 - **Docker** (recommended): Docker and Docker Compose for containerized setup.
 - **Python** (optional): For local development, install dependencies in `requirements.txt`.
-- **ffmpeg** (optional): Required for audio format conversion and playback speed adjustments. Optional if sticking to mp3.
+- **ffmpeg** (optional): Required for audio format conversion. Optional if sticking to mp3.
 
 ### Installation
 
