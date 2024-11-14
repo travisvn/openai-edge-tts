@@ -16,7 +16,7 @@ PORT = int(os.getenv('PORT', 5050))
 
 DEFAULT_VOICE = os.getenv('DEFAULT_VOICE', 'en-US-AndrewNeural')
 DEFAULT_RESPONSE_FORMAT = os.getenv('DEFAULT_RESPONSE_FORMAT', 'mp3')
-DEFAULT_SPEED = float(os.getenv('DEFAULT_SPEED', 1.0))
+DEFAULT_SPEED = float(os.getenv('DEFAULT_SPEED', 1.2))
 
 # DEFAULT_MODEL = os.getenv('DEFAULT_MODEL', 'tts-1')
 

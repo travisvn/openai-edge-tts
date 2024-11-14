@@ -31,7 +31,7 @@ This project provides a local, OpenAI-compatible text-to-speech (TTS) API using 
 
 - **Docker** (recommended): Docker and Docker Compose for containerized setup.
 - **Python** (optional): For local development, install dependencies in `requirements.txt`.
-- **ffmpeg**: Required for audio format conversion and playback speed adjustments.
+- **ffmpeg** (optional): Required for audio format conversion and playback speed adjustments. Optional if sticking to mp3.
 
 ### Installation
 
@@ -48,7 +48,7 @@ PORT=5050
 
 DEFAULT_VOICE=en-US-AndrewNeural
 DEFAULT_RESPONSE_FORMAT=mp3
-DEFAULT_SPEED=1.0
+DEFAULT_SPEED=1.2
 
 DEFAULT_LANGUAGE=en-US
 
@@ -130,7 +130,7 @@ PORT=5050
 
 DEFAULT_VOICE=en-US-AndrewNeural
 DEFAULT_RESPONSE_FORMAT=mp3
-DEFAULT_SPEED=1.0
+DEFAULT_SPEED=1.2
 
 DEFAULT_LANGUAGE=en-US
 
@@ -167,7 +167,7 @@ Generates audio from the input text. Available parameters:
 - **model** (string): Set to "tts-1" or "tts-1-hd" (default: `"tts-1"`).
 - **voice** (string): One of the OpenAI-compatible voices (alloy, echo, fable, onyx, nova, shimmer) or any valid `edge-tts` voice (default: `"en-US-AndrewNeural"`).
 - **response_format** (string): Audio format. Options: `mp3`, `opus`, `aac`, `flac`, `wav`, `pcm` (default: `mp3`).
-- **speed** (number): Playback speed (0.25 to 4.0). Default is `1.0`.
+- **speed** (number): Playback speed (0.25 to 4.0). Default is `1.2`.
 
 Example request with `curl` and saving the output to an mp3 file:
 
@@ -179,7 +179,7 @@ curl -X POST http://localhost:5050/v1/audio/speech \
     "input": "Hello, I am your AI assistant! Just let me know how I can help bring your ideas to life.",
     "voice": "echo",
     "response_format": "mp3",
-    "speed": 1.0
+    "speed": 1.2
   }' \
   --output speech.mp3
 ```
