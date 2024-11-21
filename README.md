@@ -230,6 +230,11 @@ ___
 
 ## Example Use Case 
 
+> [!TIP]
+> Swap `localhost` to your local IP (ex. `192.168.0.1`) if you have issues
+> 
+> _It may be the case that, when accessing this endpoint on a different server / computer or when the call is made from another source (like Open WebUI), you need to change the URL from `localhost` to your local IP (something like `192.168.0.1` or similar)_
+
 # Open WebUI
 
 Open up the Admin Panel and go to Settings -> Audio
