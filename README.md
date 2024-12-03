@@ -243,7 +243,9 @@ Open up the Admin Panel and go to Settings -> Audio
 
 Below, you can see a screenshot of the correct configuration for using this project to substitute the OpenAI endpoint
 
-![Screenshot of Open WebUI Admin Settings for Audio adding the correct endpoints for this project](https://utfs.io/f/MMMHiQ1TQaBoQ2AnPhUlTDGtR4B2v7E9JZN1PU5nAseoaXIc)
+![Screenshot of Open WebUI Admin Settings for Audio adding the correct endpoints for this project](https://utfs.io/f/MMMHiQ1TQaBo9GgL4WcUbjSRlqi86sV3TXh47KYBJCkdQ20M)
+
+If you're running both Open WebUI and this project in Docker, the API endpoint URL is probably `http://host.docker.internal:5050/v1`
 
 > [!NOTE]
 > View the official docs for [Open WebUI integration with OpenAI Edge TTS](https://docs.openwebui.com/tutorials/integrations/openai-edge-tts-integration)
