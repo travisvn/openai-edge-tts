@@ -4,6 +4,7 @@ from flask import Flask, request, send_file, jsonify
 from gevent.pywsgi import WSGIServer
 from dotenv import load_dotenv
 import os
+import re
 
 from tts_handler import generate_speech, get_models, get_voices
 from utils import require_api_key, AUDIO_FORMAT_MIME_TYPES
@@ -28,6 +29,10 @@ def text_to_speech():
         return jsonify({"error": "Missing 'input' in request body"}), 400
 
     text = data.get('input')
+    # 前置处理：将连续的#号合并为一个
+    text = re.sub(r'#+', '#', text)
+    text = re.sub(r'_+', '__', text)
+
     # model = data.get('model', DEFAULT_MODEL)
     voice = data.get('voice', DEFAULT_VOICE)
 
