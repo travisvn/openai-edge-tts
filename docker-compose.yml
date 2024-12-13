@@ -13,3 +13,4 @@ services:
       DEFAULT_SPEED: ${DEFAULT_SPEED:-1.2}
       DEFAULT_LANGUAGE: ${DEFAULT_LANGUAGE:-en-US}
       REQUIRE_API_KEY: ${REQUIRE_API_KEY:-True}
+    restart: unless-stopped
