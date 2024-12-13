@@ -29,8 +29,12 @@ def text_to_speech():
         return jsonify({"error": "Missing 'input' in request body"}), 400
 
     text = data.get('input')
-    # 前置处理：将连续的#号合并为一个
+    
+    # 前置处理
+    # 避免读出Markdown语法中的符号，将连续的#号合并为一个，将列表符号*去掉
     text = re.sub(r'#+', '#', text)
+    text = re.sub(r'\*\s', '', text)
+    # 把长度超过2个的连续下划线去掉（连续下划线通常为选择题填空部份）
     text = re.sub(r'_+', '__', text)
 
     # model = data.get('model', DEFAULT_MODEL)
