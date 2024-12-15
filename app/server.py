@@ -38,10 +38,10 @@ def text_to_speech():
     # 把长度超过2个的连续下划线去掉（连续下划线通常为选择题填空部份）
     text = re.sub(r'_{2,}', '__', text, flags=re.MULTILINE)
     # 处理带有语言类型的代码块
-    text = re.sub(r'```(\w+)[\s\S]*?```', r'省略\1代码块', text)
+    text = re.sub(r'^```(\w+).*\n[\s\S]*?^```', r'省略\1代码块', text, flags=re.MULTILINE)
     # 处理不带语言类型的代码块
-    text = re.sub(r'^```(\w+)[\s\S]*?^```', r'省略\1代码块', text, flags=re.MULTILINE)
-    # 处理缩进式代码块（四个空格或一个制表符开头的连续行）
+    text = re.sub(r'^```.*\n[\s\S]*?^```', '省略代码块', text, flags=re.MULTILINE)
+    # 处理缩进式代码块
     text = re.sub(r'(?:(?:^[ ]{4}|\t).*\n?)+', '省略代码块', text, flags=re.MULTILINE)
 
     # model = data.get('model', DEFAULT_MODEL)
