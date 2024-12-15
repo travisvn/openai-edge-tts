@@ -1,54 +1,44 @@
 import re
 
-def process_markdown(text):
-    # 将Markdown格式中表示标题的#号去掉
-    text = re.sub(r'^#+\s', '', text, flags=re.MULTILINE)
-    # 将Markdown格式中表示列表的*号去掉
-    text = re.sub(r'(?:^\s*\*\s|^>\s+\*\s)', '', text, flags=re.MULTILINE)
-    # 把长度超过2个的连续下划线去掉（连续下划线通常为选择题填空部份）
-    text = re.sub(r'_{2,}', '__', text, flags=re.MULTILINE)
-    # 处理带有语言类型的代码块
-    text = re.sub(r'^```(\w+).*\n[\s\S]*?^```', r'省略\1代码块', text, flags=re.MULTILINE)
-    # 处理不带语言类型的代码块
-    text = re.sub(r'^```.*\n[\s\S]*?^```', '省略代码块', text, flags=re.MULTILINE)
-    # 处理缩进式代码块
-    text = re.sub(r'(?:(?:^[ ]{4}|\t).*\n?)+', '省略代码块', text, flags=re.MULTILINE)
-    return text
-
-def test_markdown_processing():
+def test_bracket_processing():
     # 测试用例
-    test_text = """# 一级标题
-## 二级标题
-### 三级标题
+    test_cases = [
+        (
+            "这是一个[测试]文本",
+            "这是一个文本"
+        ),
+        (
+            "这是一个[链接文本](http://example.com)测试",
+            "这是一个链接文本测试"
+        ),
+        (
+            "多个测试：[测试1][测试2][链接](http://test.com)",
+            "多个测试：链接"
+        ),
+        (
+            "混合测试[测试1]text[链接1](link1)[测试2][链接2](link2)",
+            "混合测试text链接1链接2"
+        )
+    ]
 
-* 列表项1
-* 列表项2
-> * 引用中的列表项
+    def process_text(text):
+        # 从server.py复制的处理逻辑
+        # 1. 如果中括号后面没有紧跟小括号,则删除中括号及其内容
+        text = re.sub(r'\[[^\]]*\](?!\([^\)]*\))', '', text)
+        # 2. 如果中括号后面紧跟小括号,则保留中括号内容,删除小括号及其内容
+        text = re.sub(r'\[([^\]]*)\](?=\([^\)]*\))\([^\)]*\)', r'\1', text)
+        return text
 
-这是一个___下划线测试____
+    # 运行测试
+    for i, (input_text, expected_output) in enumerate(test_cases, 1):
+        result = process_text(input_text)
+        success = result == expected_output
+        print(f"\n测试用例 {i}:")
+        print(f"输入: {input_text}")
+        print(f"期望: {expected_output}")
+        print(f"实际: {result}")
+        print(f"结果: {'通过' if success else '失败'}")
 
-```python
-def hello():
-    print("Hello")
-```
-
-```
-普通代码块
-多行内容
-```
-
-    这是缩进式代码块
-    第二行
-        更多缩进
-"""
-
-    processed = process_markdown(test_text)
-    print("原始文本：")
-    print("-" * 50)
-    print(test_text)
-    print("\n处理后文本：")
-    print("-" * 50)
-    print(processed)
-
-if __name__ == "__main__":
-    test_markdown_processing()
+if __name__ == '__main__':
+    print("开始测试中括号处理逻辑...")
+    test_bracket_processing()
