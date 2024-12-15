@@ -40,10 +40,10 @@ def text_to_speech():
     # 处理带有语言类型的代码块
     text = re.sub(r'```(\w+)[\s\S]*?```', r'省略\1代码块', text)
     # 处理不带语言类型的代码块
-    text = re.sub(r'```[\s\S]*?```', r'省略代码块', text)
+    text = re.sub(r'^```(\w+)[\s\S]*?^```', r'省略\1代码块', text, flags=re.MULTILINE)
     # 处理缩进式代码块（四个空格或一个制表符开头的连续行）
     text = re.sub(r'(?:(?:^[ ]{4}|\t).*\n?)+', '省略代码块', text, flags=re.MULTILINE)
-    
+
     # model = data.get('model', DEFAULT_MODEL)
     voice = data.get('voice', DEFAULT_VOICE)
 
