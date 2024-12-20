@@ -42,7 +42,7 @@ def text_to_speech():
     # 处理不带语言类型的代码块
     text = re.sub(r'^```.*\n[\s\S]*?^```', '省略代码块', text, flags=re.MULTILINE)
     # 处理缩进式代码块
-    text = re.sub(r'(?:(?:^[ ]{4}|\t).*\n?)+', '省略代码块', text, flags=re.MULTILINE)
+    text = re.sub(r'(?:(?:^[ ]{4}|\t).*(?:\n|$))+(?:\n)?', '省略代码块\n', text, flags=re.MULTILINE)
     # 处理中括号:
     # 1. 如果中括号后面没有紧跟小括号,则删除中括号及其内容
     text = re.sub(r'\[[^\]]*\](?!\([^\)]*\))', '', text)
