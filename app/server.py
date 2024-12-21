@@ -30,23 +30,16 @@ def text_to_speech():
 
     text = data.get('input')
     
-    # 前置处理
-    # 将Markdown格式中表示标题的#号去掉
+    # Pre-processing for Mardown format
+    # Remove '#' symbols used for headers in Markdown
     text = re.sub(r'^#+\s', '', text, flags=re.MULTILINE)
-    # 将Markdown格式中表示列表的*号去掉，保留引用符号，处理任意缩进
+    # Remove '*' symbols used for lists in Markdown, preserve quote symbols, handle any indentation
     text = re.sub(r'^((?:>(?:\s*>)*\s*)?)[ \t]*\*\s', r'\1', text, flags=re.MULTILINE)
-    # 把长度超过2个的连续下划线去掉（连续下划线通常为选择题填空部份）
+    # Remove consecutive underscores longer than 2 characters (usually used for fill-in-the-blank questions)
     text = re.sub(r'_{2,}', '__', text, flags=re.MULTILINE)
-    # 处理带有语言类型的代码块
-    text = re.sub(r'^```(\w+).*\n[\s\S]*?^```', r'省略\1代码块', text, flags=re.MULTILINE)
-    # 处理不带语言类型的代码块
-    text = re.sub(r'^```.*\n[\s\S]*?^```', '省略代码块', text, flags=re.MULTILINE)
-    # 处理缩进式代码块
-    text = re.sub(r'(?:(?:^[ ]{4}|\t).*(?:\n|$))+(?:\n)?', '省略代码块\n', text, flags=re.MULTILINE)
-    # 处理中括号:
-    # 1. 如果中括号后面没有紧跟小括号,则删除中括号及其内容
+    # 1. If square brackets are not followed by parentheses, remove brackets and their content
     text = re.sub(r'\[[^\]]*\](?!\([^\)]*\))', '', text)
-    # 2. 如果中括号后面紧跟小括号,则保留中括号内容,删除小括号及其内容
+    # 2. If square brackets are followed by parentheses, keep bracket content but remove parentheses and their content
     text = re.sub(r'\[([^\]]*)\](?=\([^\)]*\))\([^\)]*\)', r'\1', text)
 
     # model = data.get('model', DEFAULT_MODEL)
