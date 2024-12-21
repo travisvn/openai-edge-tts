@@ -33,8 +33,8 @@ def text_to_speech():
     # 前置处理
     # 将Markdown格式中表示标题的#号去掉
     text = re.sub(r'^#+\s', '', text, flags=re.MULTILINE)
-    # 将Markdown格式中表示列表的*号去掉
-    text = re.sub(r'(?:^\s*\*\s|^>\s+\*\s)', '', text, flags=re.MULTILINE)
+    # 将Markdown格式中表示列表的*号去掉，保留引用符号，处理任意缩进
+    text = re.sub(r'^((?:>(?:\s*>)*\s*)?)[ \t]*\*\s', r'\1', text, flags=re.MULTILINE)
     # 把长度超过2个的连续下划线去掉（连续下划线通常为选择题填空部份）
     text = re.sub(r'_{2,}', '__', text, flags=re.MULTILINE)
     # 处理带有语言类型的代码块
