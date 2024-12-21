@@ -1,17 +1,3 @@
-# VS Code workspace files
-.vscode/*
-!.vscode/settings.json
-!.vscode/tasks.json
-!.vscode/launch.json
-!.vscode/extensions.json
-*.code-workspace
-
-# Local History for Visual Studio Code
-.history/
-
-# Built Visual Studio Code Extensions
-*.vsix
-
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
