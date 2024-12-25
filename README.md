@@ -248,7 +248,7 @@ Below, you can see a screenshot of the correct configuration for using this proj
 If you're running both Open WebUI and this project in Docker, the API endpoint URL is probably `http://host.docker.internal:5050/v1`
 
 > [!NOTE]
-> View the official docs for [Open WebUI integration with OpenAI Edge TTS](https://docs.openwebui.com/tutorials/integrations/openai-edge-tts-integration)
+> View the official docs for [Open WebUI integration with OpenAI Edge TTS](https://docs.openwebui.com/tutorials/text-to-speech/openai-edge-tts-integration)
 
 # AnythingLLM
 
