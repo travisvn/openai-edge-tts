@@ -55,6 +55,8 @@ DEFAULT_SPEED=1.2
 DEFAULT_LANGUAGE=en-US
 
 REQUIRE_API_KEY=True
+REMOVE_FILTER=False
+EXPAND_API=True
 ```
 
 Or, copy the default `.env.example` with the following:
@@ -137,6 +139,8 @@ DEFAULT_SPEED=1.2
 DEFAULT_LANGUAGE=en-US
 
 REQUIRE_API_KEY=True
+REMOVE_FILTER=False
+EXPAND_API=True
 ```
 
 ### 5. Run the Server
