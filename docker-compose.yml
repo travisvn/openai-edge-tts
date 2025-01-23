@@ -8,9 +8,9 @@ services:
     environment: # optionally define in -e argument when running docker command
       API_KEY: ${API_KEY:-your_api_key_here}
       PORT: ${PORT:-5050}
-      DEFAULT_VOICE: ${DEFAULT_VOICE:-en-US-AndrewNeural}
+      DEFAULT_VOICE: ${DEFAULT_VOICE:-en-US-AvaNeural}
       DEFAULT_RESPONSE_FORMAT: ${DEFAULT_RESPONSE_FORMAT:-mp3}
-      DEFAULT_SPEED: ${DEFAULT_SPEED:-1.2}
+      DEFAULT_SPEED: ${DEFAULT_SPEED:-1.0}
       DEFAULT_LANGUAGE: ${DEFAULT_LANGUAGE:-en-US}
       REQUIRE_API_KEY: ${REQUIRE_API_KEY:-True}
       REMOVE_FILTER: ${REMOVE_FILTER:-False}

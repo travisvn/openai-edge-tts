@@ -91,7 +91,7 @@ async def _generate_audio(text, voice, response_format, speed):
 
     return converted_output_file.name
 
-def generate_speech(text, voice, response_format, speed=1.2):
+def generate_speech(text, voice, response_format, speed=1.0):
     return asyncio.run(_generate_audio(text, voice, response_format, speed))
 
 def get_models():

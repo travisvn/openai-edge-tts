@@ -15,9 +15,9 @@ load_dotenv()
 API_KEY = os.getenv('API_KEY', 'your_api_key_here')
 PORT = int(os.getenv('PORT', 5050))
 
-DEFAULT_VOICE = os.getenv('DEFAULT_VOICE', 'en-US-AndrewNeural')
+DEFAULT_VOICE = os.getenv('DEFAULT_VOICE', 'en-US-AvaNeural')
 DEFAULT_RESPONSE_FORMAT = os.getenv('DEFAULT_RESPONSE_FORMAT', 'mp3')
-DEFAULT_SPEED = float(os.getenv('DEFAULT_SPEED', 1.2))
+DEFAULT_SPEED = float(os.getenv('DEFAULT_SPEED', 1.0))
 
 REMOVE_FILTER = getenv_bool('REMOVE_FILTER', False)
 EXPAND_API = getenv_bool('EXPAND_API', True)
