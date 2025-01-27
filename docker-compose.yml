@@ -1,7 +1,7 @@
 services:
   app:
     container_name: openai-edge-tts
-    restart: always
+    restart: unless-stopped
     build: .
     ports:
       - '${PORT:-5050}:5050'
