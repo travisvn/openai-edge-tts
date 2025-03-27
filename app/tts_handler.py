@@ -68,7 +68,9 @@ async def _generate_audio(text, voice, response_format, speed):
             "opus": "libopus",
             "flac": "flac"
         }.get(response_format, "aac"),  # Default to AAC if unknown
-        "-b:a", "192k" if response_format != "wav" else None,  # Bitrate not needed for WAV
+    ] + ([
+        "-b:a", "192k"  # Bitrate not needed for WAV
+    ] if response_format != "wav" else []) + [
         "-f", {
             "aac": "mp4",  # AAC in MP4 container
             "mp3": "mp3",
