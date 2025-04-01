@@ -3,10 +3,8 @@
 ![GitHub stars](https://img.shields.io/github/stars/travisvn/openai-edge-tts?style=social)
 ![GitHub forks](https://img.shields.io/github/forks/travisvn/openai-edge-tts?style=social)
 ![GitHub repo size](https://img.shields.io/github/repo-size/travisvn/openai-edge-tts)
-![GitHub language count](https://img.shields.io/github/languages/count/travisvn/openai-edge-tts)
 ![GitHub top language](https://img.shields.io/github/languages/top/travisvn/openai-edge-tts)
 ![GitHub last commit](https://img.shields.io/github/last-commit/travisvn/openai-edge-tts?color=red)
-![Hits](https://hits.seeyoufarm.com/api/count/incr/badge.svg?url=https%3A%2F%2Fgithub.com%2Ftravisvn%2Fopenai-edge-tts&count_bg=%2379C83D&title_bg=%23555555&icon=&icon_color=%23E7E7E7&title=hits&edge_flat=false)
 [![Discord](https://img.shields.io/badge/Discord-Voice_AI_%26_TTS_Tools-blue?logo=discord&logoColor=white)](https://discord.gg/GkFbBCBqJ6)
 [![LinkedIn](https://img.shields.io/badge/Connect_on_LinkedIn-%230077B5.svg?logo=linkedin&logoColor=white)](https://linkedin.com/in/travisvannimwegen)
 
