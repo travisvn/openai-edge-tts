@@ -4,23 +4,25 @@ from flask import Flask, request, send_file, jsonify
 from gevent.pywsgi import WSGIServer
 from dotenv import load_dotenv
 import os
+import traceback
 
+from config import DEFAULT_CONFIGS
 from handle_text import prepare_tts_input_with_context
 from tts_handler import generate_speech, get_models, get_voices
-from utils import getenv_bool, require_api_key, AUDIO_FORMAT_MIME_TYPES
+from utils import getenv_bool, require_api_key, AUDIO_FORMAT_MIME_TYPES, DETAILED_ERROR_LOGGING
 
 app = Flask(__name__)
 load_dotenv()
 
-API_KEY = os.getenv('API_KEY', 'your_api_key_here')
-PORT = int(os.getenv('PORT', 5050))
+API_KEY = os.getenv('API_KEY', DEFAULT_CONFIGS["API_KEY"])
+PORT = int(os.getenv('PORT', str(DEFAULT_CONFIGS["PORT"])))
 
-DEFAULT_VOICE = os.getenv('DEFAULT_VOICE', 'en-US-AvaNeural')
-DEFAULT_RESPONSE_FORMAT = os.getenv('DEFAULT_RESPONSE_FORMAT', 'mp3')
-DEFAULT_SPEED = float(os.getenv('DEFAULT_SPEED', 1.0))
+DEFAULT_VOICE = os.getenv('DEFAULT_VOICE', DEFAULT_CONFIGS["DEFAULT_VOICE"])
+DEFAULT_RESPONSE_FORMAT = os.getenv('DEFAULT_RESPONSE_FORMAT', DEFAULT_CONFIGS["DEFAULT_RESPONSE_FORMAT"])
+DEFAULT_SPEED = float(os.getenv('DEFAULT_SPEED', str(DEFAULT_CONFIGS["DEFAULT_SPEED"])))
 
-REMOVE_FILTER = getenv_bool('REMOVE_FILTER', False)
-EXPAND_API = getenv_bool('EXPAND_API', True)
+REMOVE_FILTER = getenv_bool('REMOVE_FILTER', DEFAULT_CONFIGS["REMOVE_FILTER"])
+EXPAND_API = getenv_bool('EXPAND_API', DEFAULT_CONFIGS["EXPAND_API"])
 
 # DEFAULT_MODEL = os.getenv('DEFAULT_MODEL', 'tts-1')
 
@@ -28,28 +30,36 @@ EXPAND_API = getenv_bool('EXPAND_API', True)
 @app.route('/audio/speech', methods=['POST'])  # Add this line for the alias
 @require_api_key
 def text_to_speech():
-    data = request.json
-    if not data or 'input' not in data:
-        return jsonify({"error": "Missing 'input' in request body"}), 400
+    try:
+        data = request.json
+        if not data or 'input' not in data:
+            return jsonify({"error": "Missing 'input' in request body"}), 400
 
-    text = data.get('input')
+        text = data.get('input')
 
-    if not REMOVE_FILTER:
-        text = prepare_tts_input_with_context(text)
+        if not REMOVE_FILTER:
+            text = prepare_tts_input_with_context(text)
 
-    # model = data.get('model', DEFAULT_MODEL)
-    voice = data.get('voice', DEFAULT_VOICE)
+        # model = data.get('model', DEFAULT_MODEL)
+        voice = data.get('voice', DEFAULT_VOICE)
 
-    response_format = data.get('response_format', DEFAULT_RESPONSE_FORMAT)
-    speed = float(data.get('speed', DEFAULT_SPEED))
-    
-    mime_type = AUDIO_FORMAT_MIME_TYPES.get(response_format, "audio/mpeg")
+        response_format = data.get('response_format', DEFAULT_RESPONSE_FORMAT)
+        speed = float(data.get('speed', DEFAULT_SPEED))
+        
+        mime_type = AUDIO_FORMAT_MIME_TYPES.get(response_format, "audio/mpeg")
 
-    # Generate the audio file in the specified format with speed adjustment
-    output_file_path = generate_speech(text, voice, response_format, speed)
+        # Generate the audio file in the specified format with speed adjustment
+        output_file_path = generate_speech(text, voice, response_format, speed)
 
-    # Return the file with the correct MIME type
-    return send_file(output_file_path, mimetype=mime_type, as_attachment=True, download_name=f"speech.{response_format}")
+        # Return the file with the correct MIME type
+        return send_file(output_file_path, mimetype=mime_type, as_attachment=True, download_name=f"speech.{response_format}")
+    except Exception as e:
+        if DETAILED_ERROR_LOGGING:
+            app.logger.error(f"Error in text_to_speech: {str(e)}\n{traceback.format_exc()}")
+        else:
+            app.logger.error(f"Error in text_to_speech: {str(e)}")
+        # Return a 500 error for unhandled exceptions, which is more standard than 400
+        return jsonify({"error": "An internal server error occurred", "details": str(e)}), 500
 
 @app.route('/v1/models', methods=['GET', 'POST'])
 @app.route('/models', methods=['GET', 'POST'])

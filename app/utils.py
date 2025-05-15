@@ -5,13 +5,19 @@ from functools import wraps
 import os
 from dotenv import load_dotenv
 
+from config import DEFAULT_CONFIGS
+
 load_dotenv()
 
 def getenv_bool(name: str, default: bool = False) -> bool:
+    # The default parameter for getenv_bool is used if the config default itself needs a fallback,
+    # or if the call site specifically wants to override the global default.
+    # For typical usage, the config default (passed at call site) is preferred.
     return os.getenv(name, str(default)).lower() in ("yes", "y", "true", "1", "t")
 
-API_KEY = os.getenv('API_KEY', 'your_api_key_here')
-REQUIRE_API_KEY = getenv_bool('REQUIRE_API_KEY', True)
+API_KEY = os.getenv('API_KEY', DEFAULT_CONFIGS["API_KEY"])
+REQUIRE_API_KEY = getenv_bool('REQUIRE_API_KEY', DEFAULT_CONFIGS["REQUIRE_API_KEY"])
+DETAILED_ERROR_LOGGING = getenv_bool('DETAILED_ERROR_LOGGING', DEFAULT_CONFIGS["DETAILED_ERROR_LOGGING"])
 
 def require_api_key(f):
     @wraps(f)
