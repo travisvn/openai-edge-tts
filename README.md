@@ -22,9 +22,21 @@ This project provides a local, OpenAI-compatible text-to-speech (TTS) API using 
 - **Supported Voices**: Maps OpenAI voices (alloy, echo, fable, onyx, nova, shimmer) to `edge-tts` equivalents.
 - **Flexible Formats**: Supports multiple audio formats (mp3, opus, aac, flac, wav, pcm).
 - **Adjustable Speed**: Option to modify playback speed (0.25x to 4.0x).
-- **Optional Direct Edge-TTS Voice Selection**: Use either OpenAI voice mappings or specify any edge-tts voice directly.
+- **Optional Direct Edge-TTS Voice Selection**: Use either OpenAI voice mappings or specify [any edge-tts voice](https://tts.travisvn.com) directly.
 
-## Getting Started
+## ⚡️ Quick start
+
+The simplest way to get started without having to configure anything is to run the command below
+
+```bash
+docker run -d -p 5050:5050 travisvn/openai-edge-tts:latest
+```
+
+This will run the service at port 5050 with all the default configs
+
+_(Docker required, obviously)_
+
+## Setup
 
 ### Prerequisites
 
@@ -71,13 +83,45 @@ cp .env.example .env
 docker compose up --build
 ```
 
-_(Note: docker-compose is not the same as docker compose)_
-
 Run with `-d` to run docker compose in "detached mode", meaning it will run in the background and free up your terminal.
 
 ```bash
 docker compose up -d
 ```
+
+<details>
+<summary>
+
+#### Building Locally with FFmpeg using Docker Compose
+
+</summary>
+
+By default, `docker compose up --build` creates a minimal image _without_ `ffmpeg`. If you're building locally (after cloning this repository) and need `ffmpeg` for audio format conversions (beyond MP3), you can include it in the build.
+
+This is controlled by the `INSTALL_FFMPEG_ARG` build argument. Set this environment variable to `true` in one of these ways:
+
+1.  **Prefixing the command:**
+    ```bash
+    INSTALL_FFMPEG_ARG=true docker compose up --build
+    ```
+2.  **Adding to your `.env` file:**
+    Add this line to the `.env` file in the project root:
+    ```env
+    INSTALL_FFMPEG_ARG=true
+    ```
+    Then, run `docker compose up --build`.
+3.  **Exporting in your shell environment:**
+    Add `export INSTALL_FFMPEG_ARG=true` to your shell configuration (e.g., `~/.zshrc`, `~/.bashrc`) and reload your shell. Then `docker compose up --build` will use it.
+
+This is for local builds. For pre-built Docker Hub images, add the `latest-ffmpeg` tag to the version
+
+```bash
+docker run -d -p 5050:5050 -e API_KEY=your_api_key_here -e PORT=5050 travisvn/openai-edge-tts:latest-ffmpeg
+```
+
+---
+
+</details>
 
 Alternatively, **run directly with Docker**:
 
@@ -94,7 +138,12 @@ docker run -d -p 5050:5050 --env-file .env openai-edge-tts
 
 4. **Access the API**: Your server will be accessible at `http://localhost:5050`.
 
+<details>
+<summary>
+
 ## Running with Python
+
+</summary>
 
 If you prefer to run this project directly with Python, follow these steps to set up a virtual environment, install dependencies, and start the server.
 
@@ -161,7 +210,14 @@ The server will start running at `http://localhost:5050`.
 
 You can now interact with the API at `http://localhost:5050/v1/audio/speech` and other available endpoints. See the [Usage](#usage) section for request examples.
 
-### Usage
+</details>
+
+<details>
+<summary>
+
+## Usage
+
+</summary>
 
 #### Endpoint: `/v1/audio/speech`
 
@@ -221,11 +277,13 @@ curl -X POST http://localhost:5050/v1/audio/speech \
   --output speech.mp3
 ```
 
-### Additional Endpoints
+#### Additional Endpoints
 
 - **POST/GET /v1/models**: Lists available TTS models.
 - **POST/GET /v1/voices**: Lists `edge-tts` voices for a given language / locale.
 - **POST/GET /v1/voices/all**: Lists all `edge-tts` voices, with language support information.
+
+</details>
 
 ### Contributing
 
