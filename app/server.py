@@ -1,14 +1,16 @@
 # server.py
 
-from flask import Flask, request, send_file, jsonify
+from flask import Flask, request, send_file, jsonify, Response
 from gevent.pywsgi import WSGIServer
 from dotenv import load_dotenv
 import os
 import traceback
+import json
+import base64
 
 from config import DEFAULT_CONFIGS
 from handle_text import prepare_tts_input_with_context
-from tts_handler import generate_speech, get_models, get_voices
+from tts_handler import generate_speech, generate_speech_stream, get_models_formatted, get_voices, get_voices_formatted
 from utils import getenv_bool, require_api_key, AUDIO_FORMAT_MIME_TYPES, DETAILED_ERROR_LOGGING
 
 app = Flask(__name__)
@@ -26,6 +28,45 @@ EXPAND_API = getenv_bool('EXPAND_API', DEFAULT_CONFIGS["EXPAND_API"])
 
 # DEFAULT_MODEL = os.getenv('DEFAULT_MODEL', 'tts-1')
 
+# Currently in "beta" — needs more extensive testing where drop-in replacement warranted
+def generate_sse_audio_stream(text, voice, speed):
+    """Generator function for SSE streaming with JSON events."""
+    try:
+        # Generate streaming audio chunks and convert to SSE format
+        for chunk in generate_speech_stream(text, voice, speed):
+            # Base64 encode the audio chunk
+            encoded_audio = base64.b64encode(chunk).decode('utf-8')
+            
+            # Create SSE event for audio delta
+            event_data = {
+                "type": "speech.audio.delta",
+                "audio": encoded_audio
+            }
+            
+            # Format as SSE event
+            yield f"data: {json.dumps(event_data)}\n\n"
+        
+        # Send completion event
+        completion_event = {
+            "type": "speech.audio.done",
+            "usage": {
+                "input_tokens": len(text.split()),  # Rough estimate
+                "output_tokens": 0,  # Edge TTS doesn't provide this
+                "total_tokens": len(text.split())
+            }
+        }
+        yield f"data: {json.dumps(completion_event)}\n\n"
+        
+    except Exception as e:
+        print(f"Error during SSE streaming: {e}")
+        # Send error event
+        error_event = {
+            "type": "error",
+            "error": str(e)
+        }
+        yield f"data: {json.dumps(error_event)}\n\n"
+
+# OpenAI endpoint format
 @app.route('/v1/audio/speech', methods=['POST'])
 @app.route('/audio/speech', methods=['POST'])  # Add this line for the alias
 @require_api_key
@@ -42,17 +83,53 @@ def text_to_speech():
 
         # model = data.get('model', DEFAULT_MODEL)
         voice = data.get('voice', DEFAULT_VOICE)
-
         response_format = data.get('response_format', DEFAULT_RESPONSE_FORMAT)
         speed = float(data.get('speed', DEFAULT_SPEED))
         
+        # Check stream format - only "sse" triggers streaming
+        stream_format = data.get('stream_format', 'audio')  # 'audio' (default) or 'sse'
+        
         mime_type = AUDIO_FORMAT_MIME_TYPES.get(response_format, "audio/mpeg")
-
-        # Generate the audio file in the specified format with speed adjustment
-        output_file_path = generate_speech(text, voice, response_format, speed)
-
-        # Return the file with the correct MIME type
-        return send_file(output_file_path, mimetype=mime_type, as_attachment=True, download_name=f"speech.{response_format}")
+        
+        if stream_format == 'sse':
+            # Return SSE streaming response with JSON events
+            def generate_sse():
+                for event in generate_sse_audio_stream(text, voice, speed):
+                    yield event
+            
+            return Response(
+                generate_sse(),
+                mimetype='text/event-stream',
+                headers={
+                    'Content-Type': 'text/event-stream',
+                    'Cache-Control': 'no-cache',
+                    'Connection': 'keep-alive',
+                    'X-Accel-Buffering': 'no'  # Disable nginx buffering
+                }
+            )
+        else:
+            # Return raw audio data (like OpenAI) - can be piped to ffplay
+            output_file_path = generate_speech(text, voice, response_format, speed)
+            
+            # Read the file and return raw audio data
+            with open(output_file_path, 'rb') as audio_file:
+                audio_data = audio_file.read()
+            
+            # Clean up the temporary file
+            try:
+                os.unlink(output_file_path)
+            except OSError:
+                pass  # File might already be cleaned up
+            
+            return Response(
+                audio_data,
+                mimetype=mime_type,
+                headers={
+                    'Content-Type': mime_type,
+                    'Content-Length': str(len(audio_data))
+                }
+            )
+            
     except Exception as e:
         if DETAILED_ERROR_LOGGING:
             app.logger.error(f"Error in text_to_speech: {str(e)}\n{traceback.format_exc()}")
@@ -61,11 +138,21 @@ def text_to_speech():
         # Return a 500 error for unhandled exceptions, which is more standard than 400
         return jsonify({"error": "An internal server error occurred", "details": str(e)}), 500
 
+# OpenAI endpoint format
 @app.route('/v1/models', methods=['GET', 'POST'])
 @app.route('/models', methods=['GET', 'POST'])
+@app.route('/v1/audio/models', methods=['GET', 'POST'])
+@app.route('/audio/models', methods=['GET', 'POST'])
 @require_api_key
 def list_models():
-    return jsonify({"data": get_models()})
+    return jsonify({"models": get_models_formatted()})
+
+# OpenAI endpoint format
+@app.route('/v1/audio/voices', methods=['GET', 'POST'])
+@app.route('/audio/voices', methods=['GET', 'POST'])
+@require_api_key
+def list_voices_formatted():
+    return jsonify({"voices": get_voices_formatted()})
 
 @app.route('/v1/voices', methods=['GET', 'POST'])
 @app.route('/voices', methods=['GET', 'POST'])
