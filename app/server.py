@@ -143,14 +143,12 @@ def text_to_speech():
 @app.route('/models', methods=['GET', 'POST'])
 @app.route('/v1/audio/models', methods=['GET', 'POST'])
 @app.route('/audio/models', methods=['GET', 'POST'])
-@require_api_key
 def list_models():
     return jsonify({"models": get_models_formatted()})
 
 # OpenAI endpoint format
 @app.route('/v1/audio/voices', methods=['GET', 'POST'])
 @app.route('/audio/voices', methods=['GET', 'POST'])
-@require_api_key
 def list_voices_formatted():
     return jsonify({"voices": get_voices_formatted()})
 
