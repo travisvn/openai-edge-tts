@@ -46,17 +46,17 @@ async def _generate_audio_stream(text, voice, speed):
     """Generate streaming TTS audio using edge-tts."""
     # Determine if the voice is an OpenAI-compatible voice or a direct edge-tts voice
     edge_tts_voice = voice_mapping.get(voice, voice)  # Use mapping if in OpenAI names, otherwise use as-is
-    
+
     # Convert speed to SSML rate format
     try:
         speed_rate = speed_to_rate(speed)  # Convert speed value to "+X%" or "-X%"
     except Exception as e:
         print(f"Error converting speed: {e}. Defaulting to +0%.")
         speed_rate = "+0%"
-    
+
     # Create the communicator for streaming
     communicator = edge_tts.Communicate(text=text, voice=edge_tts_voice, rate=speed_rate)
-    
+
     # Stream the audio data
     async for chunk in communicator.stream():
         if chunk["type"] == "audio":
@@ -64,7 +64,25 @@ async def _generate_audio_stream(text, voice, speed):
 
 def generate_speech_stream(text, voice, speed=1.0):
     """Generate streaming speech audio (synchronous wrapper)."""
-    return asyncio.run(_generate_audio_stream(text, voice, speed))
+    # Drive the async generator from a dedicated event loop and yield chunks synchronously
+    async_generator = _generate_audio_stream(text, voice, speed)
+    loop = asyncio.new_event_loop()
+    try:
+        asyncio.set_event_loop(loop)
+        while True:
+            try:
+                next_chunk = loop.run_until_complete(async_generator.__anext__())
+            except StopAsyncIteration:
+                break
+            yield next_chunk
+    finally:
+        # Best-effort cleanup of async generators and loop
+        try:
+            loop.run_until_complete(loop.shutdown_asyncgens())
+        except Exception:
+            pass
+        asyncio.set_event_loop(None)
+        loop.close()
 
 async def _generate_audio(text, voice, response_format, speed):
     """Generate TTS audio and optionally convert to a different format."""
@@ -137,7 +155,7 @@ async def _generate_audio(text, voice, response_format, speed):
         Path(converted_path).unlink(missing_ok=True)
         # Clean up the original mp3 file as well, since conversion failed
         Path(temp_mp3_path).unlink(missing_ok=True)
-        
+
         if DETAILED_ERROR_LOGGING:
             error_message = f"FFmpeg error during audio conversion. Command: '{' '.join(e.cmd)}'. Stderr: {e.stderr.decode('utf-8', 'ignore')}"
             print(error_message) # Log for server-side diagnosis
@@ -179,10 +197,10 @@ def get_voices(language=None):
 def speed_to_rate(speed: float) -> str:
     """
     Converts a multiplicative speed value to the edge-tts "rate" format.
-    
+
     Args:
         speed (float): The multiplicative speed value (e.g., 1.5 for +50%, 0.5 for -50%).
-    
+
     Returns:
         str: The formatted "rate" string (e.g., "+50%" or "-50%").
     """
