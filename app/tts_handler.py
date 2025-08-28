@@ -158,7 +158,7 @@ def get_models():
     return model_data
 
 def get_models_formatted():
-    return [{ "id": x["id"] } for x in model_data]
+    return [{ "id": x["id"], "object": "model", "owned_by": "openai-edge-tts" } for x in model_data]
 
 def get_voices_formatted():
     return [{ "id": k, "name": v } for k, v in voice_mapping.items()]
