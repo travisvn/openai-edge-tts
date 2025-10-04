@@ -17,6 +17,7 @@ app = Flask(__name__)
 load_dotenv()
 
 API_KEY = os.getenv('API_KEY', DEFAULT_CONFIGS["API_KEY"])
+HOST = os.getenv('HOST', DEFAULT_CONFIGS["HOST"])
 PORT = int(os.getenv('PORT', str(DEFAULT_CONFIGS["PORT"])))
 
 DEFAULT_VOICE = os.getenv('DEFAULT_VOICE', DEFAULT_CONFIGS["DEFAULT_VOICE"])
@@ -258,5 +259,5 @@ print(f" * TTS Endpoint: http://localhost:{PORT}/v1/audio/speech")
 print(f" ")
 
 if __name__ == '__main__':
-    http_server = WSGIServer(('0.0.0.0', PORT), app)
+    http_server = WSGIServer((HOST, PORT), app)
     http_server.serve_forever()

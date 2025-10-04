@@ -2,6 +2,7 @@
 
 DEFAULT_CONFIGS = {
     # Server settings
+    "HOST": '0.0.0.0',
     "PORT": 5050,
     "API_KEY": 'your_api_key_here',  # Fallback API key
 
