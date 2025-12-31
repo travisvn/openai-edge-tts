@@ -304,7 +304,7 @@
         // Fetch voices and models
         async function loadVoices() {
             try {
-                const response = await fetch('/v1/voices/all',{ 
+                const response = await fetch('./v1/voices/all',{ 
                     headers: {'Authorization': `Bearer ${apiKeyInput.value}`}});
                 const data = await response.json();
                 
@@ -332,7 +332,7 @@
 
         async function loadModels() {
             try {
-                const response = await fetch('/v1/models');
+                const response = await fetch('./v1/models');
                 const data = await response.json();
                 
                 modelSelect.innerHTML = '';
@@ -373,7 +373,7 @@
             try {
                 showStatus('Generating audio...', 'success');
                 
-                const response = await fetch('/v1/audio/speech', {
+                const response = await fetch('./v1/audio/speech', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
@@ -409,7 +409,7 @@
             try {
                 showStatus('Generating audio file...', 'success');
                 
-                const response = await fetch('/v1/audio/speech', {
+                const response = await fetch('./v1/audio/speech', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',

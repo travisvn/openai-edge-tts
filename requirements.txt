@@ -2,5 +2,5 @@ pip
 flask
 gevent
 python-dotenv
-edge-tts
+edge-tts==7.2.1
 emoji
