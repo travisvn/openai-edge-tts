@@ -250,11 +250,24 @@ def azure_tts():
     # Return the generated audio file
     return send_file(output_file_path, mimetype="audio/mpeg", as_attachment=True, download_name="speech.mp3")
 
+@app.route('/test')
+def serve_test_page():
+    """Serve the voice reader test HTML page"""
+    return send_file('voice-reader-test.html')
+
+# Health check endpoint for Docker
+@app.route('/health', methods=['GET'])
+def health_check():
+    """Health check endpoint for Docker container monitoring"""
+    return jsonify({"status": "healthy", "message": "Service is running"}), 200
+
 print(f" Edge TTS (Free Azure TTS) Replacement for OpenAI's TTS API")
 print(f" ")
 print(f" * Serving OpenAI Edge TTS")
 print(f" * Server running on http://localhost:{PORT}")
 print(f" * TTS Endpoint: http://localhost:{PORT}/v1/audio/speech")
+print(f" * Health Endpoint: http://localhost:{PORT}/health")
+print(f" * Test Page: http://localhost:{PORT}/test")
 print(f" ")
 
 if __name__ == '__main__':

@@ -1,0 +1,460 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Voice Reader Test</title>
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🔊</text></svg>">
+
+    <style>
+        :root {
+            --bg-color: #121212;
+            --text-color: #e0e0e0;
+            --card-bg: #1e1e1e;
+            --primary-color: #bb86fc;
+            --secondary-color: #03dac6;
+            --error-color: #cf6679;
+            --border-color: #333;
+            --input-bg: #2d2d2d;
+            --button-hover: #3700b3;
+        }
+
+        [data-theme="light"] {
+            --bg-color: #f5f5f5;
+            --text-color: #333;
+            --card-bg: #ffffff;
+            --primary-color: #6200ee;
+            --secondary-color: #03dac6;
+            --error-color: #b00020;
+            --border-color: #ddd;
+            --input-bg: #f0f0f0;
+            --button-hover: #3700b3;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            transition: background-color 0.3s, color 0.3s;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: var(--card-bg);
+            border-radius: 12px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        h1 {
+            text-align: center;
+            color: var(--primary-color);
+            margin-bottom: 30px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 500;
+        }
+
+        textarea, select, input {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            background-color: var(--input-bg);
+            color: var(--text-color);
+            font-size: 16px;
+            box-sizing: border-box;
+        }
+
+        textarea {
+            min-height: 150px;
+            resize: vertical;
+        }
+
+        .speed-container {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .speed-value {
+            min-width: 50px;
+            text-align: center;
+        }
+
+        button {
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: 500;
+            margin-right: 10px;
+            transition: background-color 0.3s;
+        }
+
+        button:hover {
+            background-color: var(--button-hover);
+        }
+
+        .button-group {
+            display: flex;
+            justify-content: center;
+            margin-top: 20px;
+        }
+
+        .drop-zone {
+            border: 2px dashed var(--border-color);
+            border-radius: 6px;
+            padding: 20px;
+            text-align: center;
+            margin: 10px 0;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+
+        .drop-zone:hover {
+            background-color: rgba(255, 255, 255, 0.05);
+        }
+
+        .theme-toggle {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background: none;
+            border: none;
+            color: var(--text-color);
+            cursor: pointer;
+            font-size: 24px;
+        }
+
+        .audio-controls {
+            margin-top: 20px;
+            text-align: center;
+        }
+
+        .status {
+            margin-top: 10px;
+            padding: 10px;
+            border-radius: 6px;
+            text-align: center;
+        }
+
+        .error {
+            background-color: rgba(207, 102, 121, 0.2);
+            color: var(--error-color);
+        }
+
+        .success {
+            background-color: rgba(3, 218, 198, 0.2);
+            color: var(--secondary-color);
+        }
+
+        @media (max-width: 600px) {
+            .container {
+                padding: 15px;
+            }
+            
+            .button-group {
+                flex-direction: column;
+                gap: 10px;
+            }
+            
+            button {
+                width: 100%;
+                margin-right: 0;
+            }
+        }
+    </style>
+</head>
+<body>
+    <button class="theme-toggle" onclick="toggleTheme()">🌓</button>
+    <div class="container">
+        <h1>Voice Reader Test</h1>
+        
+        <div class="form-group">
+            <label for="textInput">Text to Convert:</label>
+            <textarea id="textInput" placeholder="Enter text here...">Hello World!</textarea>
+            <div class="drop-zone" id="dropZone">
+                <p>Drag & drop a text file here or click to select</p>
+                <input type="file" id="fileInput" accept=".txt,.md" style="display: none;">
+            </div>
+        </div>
+        
+        <div class="form-group">
+            <label for="voiceSelect">Voice:</label>
+            <input list="voices" id="voiceSelect" placeholder="Search or select a voice...">
+            <datalist id="voices">
+                <!-- Options will be populated by JavaScript -->
+            </datalist>
+        </div>
+        
+        <div class="form-group">
+            <label for="modelSelect">Model:</label>
+            <select id="modelSelect">
+                <option value="">Loading models...</option>
+            </select>
+        </div>
+        
+        <div class="form-group">
+            <label for="speedSlider">Speed: <span id="speedValue" class="speed-value">1.0</span></label>
+            <div class="speed-container">
+                <input type="range" id="speedSlider" min="0.5" max="2.5" step="0.1" value="1.0">
+            </div>
+        </div>
+        
+        <div class="form-group">
+            <label for="apiKey">API Key:</label>
+            <input type="text" id="apiKey" placeholder="your_api_key_here" value="your_api_key_here">
+        </div>
+        
+        <div class="button-group">
+            <button id="playButton">Play</button>
+            <button id="saveButton">Save Audio</button>
+        </div>
+        
+        <div class="audio-controls">
+            <audio id="audioPlayer" controls style="width: 100%; margin-top: 20px;"></audio>
+        </div>
+        
+        <div id="status" class="status" style="display: none;"></div>
+    </div>
+
+    <script>
+        // Theme toggle functionality
+        function toggleTheme() {
+            const currentTheme = document.body.getAttribute('data-theme') || 'dark';
+            const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+            document.body.setAttribute('data-theme', newTheme);
+            localStorage.setItem('theme', newTheme);
+        }
+
+        // Load saved theme
+        const savedTheme = localStorage.getItem('theme') || 'dark';
+        document.body.setAttribute('data-theme', savedTheme);
+
+        // Initialize elements
+        const textInput = document.getElementById('textInput');
+        const voiceSelect = document.getElementById('voiceSelect');
+        const modelSelect = document.getElementById('modelSelect');
+        const speedSlider = document.getElementById('speedSlider');
+        const speedValue = document.getElementById('speedValue');
+        const apiKeyInput = document.getElementById('apiKey');
+        const playButton = document.getElementById('playButton');
+        const saveButton = document.getElementById('saveButton');
+        const audioPlayer = document.getElementById('audioPlayer');
+        const statusDiv = document.getElementById('status');
+        const dropZone = document.getElementById('dropZone');
+        const fileInput = document.getElementById('fileInput');
+
+        // Update speed value display
+        speedSlider.addEventListener('input', () => {
+            speedValue.textContent = speedSlider.value;
+        });
+
+        // File drag and drop functionality
+        dropZone.addEventListener('click', () => {
+            fileInput.click();
+        });
+
+        dropZone.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            dropZone.style.borderColor = 'var(--primary-color)';
+        });
+
+        dropZone.addEventListener('dragleave', () => {
+            dropZone.style.borderColor = 'var(--border-color)';
+        });
+
+        dropZone.addEventListener('drop', (e) => {
+            e.preventDefault();
+            dropZone.style.borderColor = 'var(--border-color)';
+            
+            if (e.dataTransfer.files.length > 0) {
+                handleFile(e.dataTransfer.files[0]);
+            }
+        });
+
+        fileInput.addEventListener('change', () => {
+            if (fileInput.files.length > 0) {
+                handleFile(fileInput.files[0]);
+            }
+        });
+
+        function handleFile(file) {
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                textInput.value = e.target.result;
+            };
+            reader.readAsText(file);
+        }
+
+        // Fetch voices and models
+        async function loadVoices() {
+            try {
+                const response = await fetch('./v1/voices/all',{ 
+                    headers: {'Authorization': `Bearer ${apiKeyInput.value}`}});
+                const data = await response.json();
+                
+                const voiceDatalist = document.getElementById('voices');
+                voiceDatalist.innerHTML = '';
+                data.voices.forEach(voice => {
+                    const option = document.createElement('option');
+                    option.value = voice.ShortName || voice.short_name || voice.name;
+                    option.textContent = voice.ShortName || voice.short_name || voice.name;
+                    voiceDatalist.appendChild(option);
+                });
+                
+                // Set default voice if exists
+                const defaultVoice = 'en-US-AndrewNeural';
+                const defaultOption = voiceDatalist.querySelector(`option[value="${defaultVoice}"]`);
+                if (defaultOption) {
+                    document.getElementById('voiceSelect').value = defaultVoice;
+                }
+            } catch (error) {
+                console.error('Error loading voices:', error);
+                const voiceDatalist = document.getElementById('voices');
+                voiceDatalist.innerHTML = '<option value="">Error loading voices</option>';
+            }
+        }
+
+        async function loadModels() {
+            try {
+                const response = await fetch('./v1/models');
+                const data = await response.json();
+                
+                modelSelect.innerHTML = '';
+                data.models.forEach(model => {
+                    const option = document.createElement('option');
+                    option.value = model.id;
+                    option.textContent = model.id;
+                    modelSelect.appendChild(option);
+                });
+                
+                // Set default model
+                const defaultModel = 'tts-1-hd';
+                if (modelSelect.querySelector(`option[value="${defaultModel}"]`)) {
+                    modelSelect.value = defaultModel;
+                }
+            } catch (error) {
+                console.error('Error loading models:', error);
+                modelSelect.innerHTML = '<option value="">Error loading models</option>';
+            }
+        }
+
+        // Initialize
+        loadVoices();
+        loadModels();
+
+        // Sanitize and prepare text for TTS
+        function sanitizeForTTS(text) {
+            if (typeof text !== 'string') return '';
+            return text
+                .trim()                          // Remove leading/trailing whitespace
+                .replace(/\s+/g, ' ')           // Normalize internal whitespace
+                .replace(/[^\x20-\x7E\u00A0-\uFFFF]/g, '') // Remove non-printable / unsafe Unicode (adjust as needed)
+                .substring(0, 4000);            // Optional: limit length (adjust per API spec)
+        }
+
+        // Play audio
+        playButton.addEventListener('click', async () => {
+            try {
+                showStatus('Generating audio...', 'success');
+                
+                const response = await fetch('./v1/audio/speech', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${apiKeyInput.value}`
+                    },
+                    body: JSON.stringify({
+                        input: sanitizeForTTS(textInput.value),
+                        voice: voiceSelect.value,
+                        model: modelSelect.value,
+                        speed: parseFloat(speedSlider.value),
+                        response_format: 'mp3'
+                    })
+                });
+
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+
+                const audioBlob = await response.blob();
+                const audioUrl = URL.createObjectURL(audioBlob);
+                audioPlayer.src = audioUrl;
+                audioPlayer.play();
+                
+                showStatus('Audio playing!', 'success');
+            } catch (error) {
+                console.error('Error:', error);
+                showStatus(`Error: ${error.message}`, 'error');
+            }
+        });
+
+        // Save audio
+        saveButton.addEventListener('click', async () => {
+            try {
+                showStatus('Generating audio file...', 'success');
+                
+                const response = await fetch('./v1/audio/speech', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${apiKeyInput.value}`
+                    },
+                    body: JSON.stringify({
+                        input: sanitizeForTTS(textInput.value),
+                        voice: voiceSelect.value,
+                        model: modelSelect.value,
+                        speed: parseFloat(speedSlider.value),
+                        response_format: 'mp3'
+                    })
+                });
+
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+
+                const blob = await response.blob();
+                const url = window.URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = 'speech.mp3';
+                document.body.appendChild(a);
+                a.click();
+                window.URL.revokeObjectURL(url);
+                document.body.removeChild(a);
+                
+                showStatus('Audio file downloaded!', 'success');
+            } catch (error) {
+                console.error('Error:', error);
+                showStatus(`Error: ${error.message}`, 'error');
+            }
+        });
+
+        function showStatus(message, type) {
+            statusDiv.textContent = message;
+            statusDiv.className = `status ${type}`;
+            statusDiv.style.display = 'block';
+            
+            // Hide after 5 seconds
+            setTimeout(() => {
+                statusDiv.style.display = 'none';
+            }, 5000);
+        }
+    </script>
+</body>
+</html>
