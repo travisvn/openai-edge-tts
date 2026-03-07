@@ -110,11 +110,12 @@ async def _generate_audio(text, voice, response_format, speed):
             "mp3": "libmp3lame",
             "wav": "pcm_s16le",
             "opus": "libopus",
-            "flac": "flac"
+            "flac": "flac",
+            "pcm": "pcm_s16le",
         }.get(response_format, "aac"),  # Default to AAC if unknown
     ]
 
-    if response_format != "wav":
+    if response_format not in ("wav", "pcm"):
         ffmpeg_command.extend(["-b:a", "192k"])
 
     ffmpeg_command.extend([
@@ -123,7 +124,8 @@ async def _generate_audio(text, voice, response_format, speed):
             "mp3": "mp3",
             "wav": "wav",
             "opus": "ogg",
-            "flac": "flac"
+            "flac": "flac",
+            "pcm": "s16le",  # raw 16-bit PCM
         }.get(response_format, response_format),  # Default to matching format
         "-y",  # Overwrite without prompt
         converted_path  # Output file path
