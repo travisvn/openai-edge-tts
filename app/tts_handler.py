@@ -13,6 +13,25 @@ from config import DEFAULT_CONFIGS
 # Language default (environment variable)
 DEFAULT_LANGUAGE = os.getenv('DEFAULT_LANGUAGE', DEFAULT_CONFIGS["DEFAULT_LANGUAGE"])
 
+
+# ─────────────────────────────────────────────────────
+# Backend dispatch
+# ─────────────────────────────────────────────────────
+# TTS_BACKEND selects which synthesis engine actually runs:
+#   "edge-tts" (default) → Microsoft Edge TTS via the edge_tts library (free)
+#   "60db"               → 60db.ai REST API (paid, needs SIXTYDB_API_KEY)
+#
+# The public wrappers (generate_speech / generate_speech_stream / get_voices /
+# get_voices_formatted) check this at call time so server.py routes don't need
+# to know which backend is active.
+
+def _backend_name() -> str:
+    return os.getenv("TTS_BACKEND", DEFAULT_CONFIGS["TTS_BACKEND"]).strip().lower()
+
+
+def _use_sixtydb() -> bool:
+    return _backend_name() == "60db"
+
 # OpenAI voice names mapped to edge-tts equivalents
 voice_mapping = {
     'alloy': 'en-US-JennyNeural',
@@ -63,7 +82,15 @@ async def _generate_audio_stream(text, voice, speed):
             yield chunk["data"]
 
 def generate_speech_stream(text, voice, speed=1.0):
-    """Generate streaming speech audio (synchronous wrapper)."""
+    """Generate streaming speech audio (synchronous wrapper).
+
+    Dispatches to sixtydb_handler when TTS_BACKEND=60db; otherwise uses
+    edge-tts. The 60db path slices a buffered MP3 into chunks so the SSE
+    handler in server.py works unchanged.
+    """
+    if _use_sixtydb():
+        import sixtydb_handler
+        return sixtydb_handler.generate_speech_stream(text, voice, speed)
     return asyncio.run(_generate_audio_stream(text, voice, speed))
 
 async def _generate_audio(text, voice, response_format, speed):
@@ -152,6 +179,14 @@ async def _generate_audio(text, voice, response_format, speed):
     return converted_path
 
 def generate_speech(text, voice, response_format, speed=1.0):
+    """Buffered synthesis. Returns a path to a temp file in `response_format`.
+
+    Dispatches to sixtydb_handler when TTS_BACKEND=60db; otherwise uses
+    edge-tts.
+    """
+    if _use_sixtydb():
+        import sixtydb_handler
+        return sixtydb_handler.generate_speech(text, voice, response_format, speed)
     return asyncio.run(_generate_audio(text, voice, response_format, speed))
 
 def get_models():
@@ -161,6 +196,11 @@ def get_models_formatted():
     return [{ "id": x["id"] } for x in model_data]
 
 def get_voices_formatted():
+    """For /v1/audio/voices — when 60db is the backend, returns the live
+    catalog from /default-voices + /myvoices instead of the OpenAI aliases."""
+    if _use_sixtydb():
+        import sixtydb_handler
+        return sixtydb_handler.get_voices_formatted()
     return [{ "id": k, "name": v } for k, v in voice_mapping.items()]
 
 async def _get_voices(language=None):
@@ -174,6 +214,10 @@ async def _get_voices(language=None):
     return filtered_voices
 
 def get_voices(language=None):
+    """For /v1/voices and /v1/voices/all — dispatches per-backend."""
+    if _use_sixtydb():
+        import sixtydb_handler
+        return sixtydb_handler.get_voices(language)
     return asyncio.run(_get_voices(language))
 
 def speed_to_rate(speed: float) -> str:
