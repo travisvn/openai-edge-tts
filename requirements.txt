@@ -1,5 +1,10 @@
 flask
 gevent
 python-dotenv
-edge-tts
+# Version pinnee : Microsoft rote periodiquement le TrustedClientToken de son
+# endpoint gratuit Edge TTS. Une version d'edge-tts trop ancienne renvoie
+# WSServerHandshakeError: 403 "Invalid response status" (proxy -> 500).
+# 7.3.1 est la derniere version verifiee fonctionnelle (test 2026-10-14).
+# En cas de panne TTS (403/500), bump cette version vers la derniere dispo.
+edge-tts==7.3.1
 emoji

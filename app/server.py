@@ -250,8 +250,16 @@ def azure_tts():
     # Return the generated audio file
     return send_file(output_file_path, mimetype="audio/mpeg", as_attachment=True, download_name="speech.mp3")
 
+# Version edge-tts au demarrage : diagnostic indispensable quand Microsoft
+# rote le token (panne 403/500) — on compare cette version a la derniere dispo.
+try:
+    from importlib.metadata import version as _pkg_version
+    _EDGE_TTS_VERSION = _pkg_version("edge-tts")
+except Exception:  # pragma: no cover - ne doit jamais bloquer le demarrage
+    _EDGE_TTS_VERSION = "inconnue"
+
 print(f" Edge TTS (Free Azure TTS) Replacement for OpenAI's TTS API")
-print(f" ")
+print(f" * edge-tts version: {_EDGE_TTS_VERSION}")
 print(f" * Serving OpenAI Edge TTS")
 print(f" * Server running on http://localhost:{PORT}")
 print(f" * TTS Endpoint: http://localhost:{PORT}/v1/audio/speech")
