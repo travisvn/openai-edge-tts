@@ -3,6 +3,7 @@
 DEFAULT_CONFIGS = {
     # Server settings
     "PORT": 5050,
+    "HOST": '0.0.0.0',  # Bind address; use 127.0.0.1 for local-only access
     "API_KEY": 'your_api_key_here',  # Fallback API key
 
     # TTS settings
@@ -16,4 +17,5 @@ DEFAULT_CONFIGS = {
     "REMOVE_FILTER": False,
     "EXPAND_API": True,
     "DETAILED_ERROR_LOGGING": True,
+    "PCM_TRIM_SILENCE": False,  # Shorten pauses between sentences in streamed PCM
 } 

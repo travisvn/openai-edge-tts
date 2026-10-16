@@ -10,7 +10,7 @@ import base64
 
 from config import DEFAULT_CONFIGS
 from handle_text import prepare_tts_input_with_context
-from tts_handler import generate_speech, generate_speech_stream, get_models_formatted, get_voices, get_voices_formatted
+from tts_handler import generate_speech, generate_speech_stream, stream_pcm, is_ffmpeg_installed, get_models_formatted, get_voices, get_voices_formatted
 from utils import getenv_bool, require_api_key, AUDIO_FORMAT_MIME_TYPES, DETAILED_ERROR_LOGGING
 
 app = Flask(__name__)
@@ -18,6 +18,8 @@ load_dotenv()
 
 API_KEY = os.getenv('API_KEY', DEFAULT_CONFIGS["API_KEY"])
 PORT = int(os.getenv('PORT', str(DEFAULT_CONFIGS["PORT"])))
+HOST = os.getenv('HOST', DEFAULT_CONFIGS["HOST"])
+FFMPEG_AVAILABLE = is_ffmpeg_installed()  # checked once; spawning ffmpeg per request is slow
 
 DEFAULT_VOICE = os.getenv('DEFAULT_VOICE', DEFAULT_CONFIGS["DEFAULT_VOICE"])
 DEFAULT_RESPONSE_FORMAT = os.getenv('DEFAULT_RESPONSE_FORMAT', DEFAULT_CONFIGS["DEFAULT_RESPONSE_FORMAT"])
@@ -107,6 +109,10 @@ def text_to_speech():
                     'X-Accel-Buffering': 'no'  # Disable nginx buffering
                 }
             )
+        elif response_format == 'pcm' and FFMPEG_AVAILABLE:
+            # Stream raw PCM as edge-tts produces it (low time-to-first-audio)
+            return Response(stream_pcm(text, voice, speed), mimetype=mime_type,
+                            headers={'Cache-Control': 'no-cache', 'X-Accel-Buffering': 'no'})
         else:
             # Return raw audio data (like OpenAI) - can be piped to ffplay
             output_file_path = generate_speech(text, voice, response_format, speed)
@@ -258,5 +264,5 @@ print(f" * TTS Endpoint: http://localhost:{PORT}/v1/audio/speech")
 print(f" ")
 
 if __name__ == '__main__':
-    http_server = WSGIServer(('0.0.0.0', PORT), app)
+    http_server = WSGIServer((HOST, PORT), app)
     http_server.serve_forever()

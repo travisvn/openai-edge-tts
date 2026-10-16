@@ -4,11 +4,15 @@ import edge_tts
 import asyncio
 import tempfile
 import subprocess
+import threading
 import os
 from pathlib import Path
 
-from utils import DETAILED_ERROR_LOGGING
+from utils import DETAILED_ERROR_LOGGING, getenv_bool
 from config import DEFAULT_CONFIGS
+
+# Trim long pauses between sentences in streamed PCM (environment variable)
+PCM_TRIM_SILENCE = getenv_bool('PCM_TRIM_SILENCE', DEFAULT_CONFIGS["PCM_TRIM_SILENCE"])
 
 # Language default (environment variable)
 DEFAULT_LANGUAGE = os.getenv('DEFAULT_LANGUAGE', DEFAULT_CONFIGS["DEFAULT_LANGUAGE"])
@@ -109,12 +113,16 @@ async def _generate_audio(text, voice, response_format, speed):
             "aac": "aac",
             "mp3": "libmp3lame",
             "wav": "pcm_s16le",
+            "pcm": "pcm_s16le",
             "opus": "libopus",
             "flac": "flac"
         }.get(response_format, "aac"),  # Default to AAC if unknown
     ]
 
-    if response_format != "wav":
+    if response_format == "pcm":
+        # OpenAI-compatible "pcm": raw s16le, mono, 24 kHz
+        ffmpeg_command.extend(["-ar", "24000", "-ac", "1"])
+    elif response_format != "wav":
         ffmpeg_command.extend(["-b:a", "192k"])
 
     ffmpeg_command.extend([
@@ -122,6 +130,7 @@ async def _generate_audio(text, voice, response_format, speed):
             "aac": "mp4",  # AAC in MP4 container
             "mp3": "mp3",
             "wav": "wav",
+            "pcm": "s16le",
             "opus": "ogg",
             "flac": "flac"
         }.get(response_format, response_format),  # Default to matching format
@@ -194,3 +203,61 @@ def speed_to_rate(speed: float) -> str:
 
     # Format with a leading "+" or "-" as required
     return f"{percentage_change:+.0f}%"
+
+
+def stream_pcm(text, voice, speed=1.0):
+    """Yield OpenAI-compatible PCM (s16le, mono, 24 kHz) while edge-tts is still synthesizing.
+
+    edge-tts mp3 chunks are piped into ffmpeg as they arrive, so the first
+    audio reaches the client in about a second instead of after the whole
+    phrase has been synthesized and converted.
+    """
+    edge_tts_voice = voice_mapping.get(voice, voice)
+    try:
+        speed_rate = speed_to_rate(speed)
+    except Exception:
+        speed_rate = "+0%"
+
+    ffmpeg_command = [
+        "ffmpeg", "-hide_banner", "-loglevel", "error",
+        "-probesize", "32", "-analyzeduration", "0", "-fflags", "nobuffer",
+        "-f", "mp3", "-i", "pipe:0",
+    ]
+    if PCM_TRIM_SILENCE:
+        # Edge voices leave long gaps between sentences; trim them to ~0.15 s
+        ffmpeg_command += ["-af", "silenceremove=stop_periods=-1:stop_duration=0.2:stop_threshold=-50dB:stop_silence=0.15"]
+    ffmpeg_command += ["-f", "s16le", "-ar", "24000", "-ac", "1", "pipe:1"]
+
+    proc = subprocess.Popen(
+        ffmpeg_command,
+        stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.DEVNULL,
+    )
+
+    async def _feed():
+        communicator = edge_tts.Communicate(text=text, voice=edge_tts_voice, rate=speed_rate)
+        async for chunk in communicator.stream():
+            if chunk["type"] == "audio":
+                proc.stdin.write(chunk["data"])
+                proc.stdin.flush()
+
+    def _feeder():
+        try:
+            asyncio.run(_feed())
+        except Exception as e:
+            print(f"stream_pcm feeder error: {e}")
+        finally:
+            try:
+                proc.stdin.close()
+            except Exception:
+                pass
+
+    threading.Thread(target=_feeder, daemon=True).start()
+    try:
+        while True:
+            data = proc.stdout.read1(4800) if hasattr(proc.stdout, "read1") else proc.stdout.read(4800)
+            if not data:
+                break
+            yield data
+    finally:
+        proc.stdout.close()
+        proc.wait()

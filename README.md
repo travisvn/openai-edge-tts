@@ -70,6 +70,9 @@ REQUIRE_API_KEY=True
 REMOVE_FILTER=False
 EXPAND_API=True
 DETAILED_ERROR_LOGGING=True
+
+HOST=0.0.0.0
+PCM_TRIM_SILENCE=False
 ```
 
 Or, copy the default `.env.example` with the following:
@@ -195,6 +198,9 @@ REQUIRE_API_KEY=True
 REMOVE_FILTER=False
 EXPAND_API=True
 DETAILED_ERROR_LOGGING=True
+
+HOST=0.0.0.0
+PCM_TRIM_SILENCE=False
 ```
 
 ### 5. Run the Server
@@ -232,7 +238,7 @@ Generates audio from the input text. Available parameters:
 
 - **model** (string): Set to "tts-1" or "tts-1-hd" (default: `"tts-1"`).
 - **voice** (string): One of the OpenAI-compatible voices (alloy, echo, fable, onyx, nova, shimmer) or any valid `edge-tts` voice (default: `"en-US-AvaNeural"`).
-- **response_format** (string): Audio format. Options: `mp3`, `opus`, `aac`, `flac`, `wav`, `pcm` (default: `mp3`).
+- **response_format** (string): Audio format. Options: `mp3`, `opus`, `aac`, `flac`, `wav`, `pcm` (default: `mp3`). `pcm` is raw 16-bit little-endian mono audio at 24 kHz (same as OpenAI), streamed as it is synthesized; it requires `ffmpeg`. Set `PCM_TRIM_SILENCE=True` to shorten the pauses between sentences.
 - **speed** (number): Playback speed (0.25 to 4.0). Default is `1.0`.
 - **stream_format** (string): Response format. Options: `"audio"` (raw audio data, default) or `"sse"` (Server-Sent Events streaming with JSON events).
 
