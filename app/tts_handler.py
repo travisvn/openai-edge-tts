@@ -63,8 +63,23 @@ async def _generate_audio_stream(text, voice, speed):
             yield chunk["data"]
 
 def generate_speech_stream(text, voice, speed=1.0):
-    """Generate streaming speech audio (synchronous wrapper)."""
-    return asyncio.run(_generate_audio_stream(text, voice, speed))
+    """Generate streaming speech audio (synchronous generator wrapper)."""
+    ag = _generate_audio_stream(text, voice, speed)
+    loop = asyncio.new_event_loop()
+    try:
+        while True:
+            yield loop.run_until_complete(ag.__anext__())
+    except StopAsyncIteration:
+        pass
+    finally:
+        # Close the async generator so a client disconnect does not leave
+        # its aiohttp/edge-tts connection behind.
+        if hasattr(ag, 'aclose'):
+            try:
+                loop.run_until_complete(ag.aclose())
+            except Exception:
+                pass
+        loop.close()
 
 async def _generate_audio(text, voice, response_format, speed):
     """Generate TTS audio and optionally convert to a different format."""
