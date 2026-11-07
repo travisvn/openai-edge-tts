@@ -26,6 +26,20 @@ class StreamingTests(unittest.TestCase):
             self.assertEqual(list(stream), [b'second'])
         self.assertEqual(state, ['resumed'])
 
+    def test_stream_cleanup_closes_async_generator_on_disconnect(self):
+        state = []
+        async def source(*args):
+            try:
+                yield b'first'
+                yield b'second'
+            finally:
+                state.append('closed')
+        with patch.object(tts_handler, '_generate_audio_stream', source):
+            stream = tts_handler.generate_speech_stream('hello', 'alloy')
+            self.assertEqual(next(stream), b'first')
+            stream.close()
+        self.assertEqual(state, ['closed'])
+
     def test_sse_usage_keeps_original_unicode_characters(self):
         text = '  你好，世界！ **测试**  '
         with patch.object(server, 'generate_speech_stream', return_value=iter([b'one', b'two'])):
