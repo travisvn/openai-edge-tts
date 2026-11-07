@@ -29,7 +29,7 @@ EXPAND_API = getenv_bool('EXPAND_API', DEFAULT_CONFIGS["EXPAND_API"])
 # DEFAULT_MODEL = os.getenv('DEFAULT_MODEL', 'tts-1')
 
 # Currently in "beta" — needs more extensive testing where drop-in replacement warranted
-def generate_sse_audio_stream(text, voice, speed):
+def generate_sse_audio_stream(text, voice, speed, input_chars=None):
     """Generator function for SSE streaming with JSON events."""
     try:
         # Generate streaming audio chunks and convert to SSE format
@@ -47,12 +47,14 @@ def generate_sse_audio_stream(text, voice, speed):
             yield f"data: {json.dumps(event_data)}\n\n"
         
         # Send completion event
+        # New API TTS billing uses Unicode input characters, not whitespace words.
+        input_chars = len(text) if input_chars is None else input_chars
         completion_event = {
             "type": "speech.audio.done",
             "usage": {
-                "input_tokens": len(text.split()),  # Rough estimate
+                "input_tokens": input_chars,
                 "output_tokens": 0,  # Edge TTS doesn't provide this
-                "total_tokens": len(text.split())
+                "total_tokens": input_chars
             }
         }
         yield f"data: {json.dumps(completion_event)}\n\n"
@@ -77,6 +79,7 @@ def text_to_speech():
             return jsonify({"error": "Missing 'input' in request body"}), 400
 
         text = data.get('input')
+        input_chars = len(text)
 
         if not REMOVE_FILTER:
             text = prepare_tts_input_with_context(text)
@@ -94,7 +97,7 @@ def text_to_speech():
         if stream_format == 'sse':
             # Return SSE streaming response with JSON events
             def generate_sse():
-                for event in generate_sse_audio_stream(text, voice, speed):
+                for event in generate_sse_audio_stream(text, voice, speed, input_chars):
                     yield event
             
             return Response(
